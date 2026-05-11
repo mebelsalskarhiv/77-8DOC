@@ -9,6 +9,7 @@ from fastapi import APIRouter, HTTPException
 from backend.config import settings
 from backend.models import DocumentFilter, InvoiceDocument, RealizationDocument
 from backend.ole_1c77 import Connection1C77, fetch_invoices, fetch_realizations
+from backend.database import db
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["1C 7.7 Documents"])
@@ -74,6 +75,9 @@ async def get_realizations(filter: DocumentFilter):
             prefix = filter.firm_prefix.upper().strip()
             documents = [d for d in documents if d.get('number', '').upper().startswith(prefix)]
         
+        # Сохраняем в БД
+        db.save_documents_77(documents, "realization", filter.firm_prefix if hasattr(filter, 'firm_prefix') else None)
+        
         return documents
     except Exception as e:
         logger.exception("Ошибка при получении документов Реализация")
@@ -110,6 +114,9 @@ async def get_invoices(filter: DocumentFilter):
         if hasattr(filter, 'firm_prefix') and filter.firm_prefix:
             prefix = filter.firm_prefix.upper().strip()
             documents = [d for d in documents if d.get('number', '').upper().startswith(prefix)]
+        
+        # Сохраняем в БД
+        db.save_documents_77(documents, "invoice", filter.firm_prefix if hasattr(filter, 'firm_prefix') else None)
         
         return documents
     except Exception as e:

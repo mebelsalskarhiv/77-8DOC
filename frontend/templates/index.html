@@ -345,13 +345,12 @@
         </div>
     </div>
 
-    <!-- Alpine.js (должен загрузиться перед app.js) -->
-    <script src="/static/js/alpine.min.js"></script>
+    <script src="/static/js/alpine.min.js" defer></script>
     
     <!-- Bootstrap JS -->
-    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/bootstrap.bundle.min.js" defer></script>
     
-    <!-- App JS (использует Alpine.js, поэтому после него) -->
-    <script src="/static/js/app.js"></script>
+    <!-- App JS (использует Alpine.js, поэтому загружается последним) -->
+    <script src="/static/js/app.js" defer></script>
 </body>
 </html>

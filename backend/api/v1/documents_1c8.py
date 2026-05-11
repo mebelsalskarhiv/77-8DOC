@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException
 
 from backend.config import settings
 from backend.models import DocumentFilter, InvoiceDocument, RealizationDocument
+from backend.database import db
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["1C 8 OData Documents"])
@@ -204,6 +205,8 @@ async def get_realizations_1c8(filter: DocumentFilter, firm_prefix: Optional[str
     # Используем firm_prefix из filter если не передан явно
     prefix = firm_prefix or (filter.firm_prefix if hasattr(filter, 'firm_prefix') else None)
     documents = await fetch_realizations_1c8(filter.start_date, filter.end_date, prefix)
+    # Сохраняем в БД
+    db.save_documents_1c8(documents, "realization", prefix)
     return documents
 
 
@@ -213,5 +216,7 @@ async def get_invoices_1c8(filter: DocumentFilter, firm_prefix: Optional[str] = 
     # Используем firm_prefix из filter если не передан явно
     prefix = firm_prefix or (filter.firm_prefix if hasattr(filter, 'firm_prefix') else None)
     documents = await fetch_invoices_1c8(filter.start_date, filter.end_date, prefix)
+    # Сохраняем в БД
+    db.save_documents_1c8(documents, "invoice", prefix)
     return documents
 
