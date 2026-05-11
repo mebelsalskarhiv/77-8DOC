@@ -1,47 +1,45 @@
 ```
 # Dependencies
-.venv/
-venv/
+node_modules/
 __pycache__/
 *.pyc
-node_modules/
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Logs and temporary files
-*.log
-*.tmp
-
-# Editors
-.vscode/
-.idea/
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
 
 # Build artifacts
 dist/
 build/
 target/
+*.o
+*.obj
+*.out
 
-# Python specific
-*.pyc
-__pycache__/
-*.pyo
-*.pyd
-.Python
-*.so
+# Virtual environments
+.venv/
+venv/
+env/
 
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
+# Logs
+*.log
 
-# Testing
-.pytest_cache/
-.mypy_cache/
+# Environment files
+.env
+.env.local
+*.env.*
 
-# OS generated files
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS files
 .DS_Store
 Thumbs.db
+
+# MyPy cache
+.mypy_cache/
 ```

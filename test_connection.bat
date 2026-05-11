@@ -28,6 +28,8 @@ echo.
 REM Create temporary Python script for testing
 echo import os > test_connection.py
 echo from dotenv import load_dotenv >> test_connection.py
+echo import sys >> test_connection.py
+echo sys.path.insert(0, 'venv/Lib/site-packages') >> test_connection.py
 echo import pythoncom >> test_connection.py
 echo import win32com.client >> test_connection.py
 echo. >> test_connection.py
@@ -103,11 +105,18 @@ echo     exit(1) >> test_connection.py
 
 echo Running test...
 echo.
-python test_connection.py
+call venv\Scripts\python.exe test_connection.py
+set TEST_RESULT=%errorlevel%
 
 REM Delete temporary file
 del test_connection.py >nul 2>&1
 
 echo.
+if %TEST_RESULT% equ 0 (
+    echo [SUCCESS] All tests passed!
+) else (
+    echo [FAILED] Tests failed. Check the errors above.
+)
 echo ========================================
 pause
+exit /b %TEST_RESULT%

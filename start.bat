@@ -47,13 +47,16 @@ echo.
 
 REM Check dependencies
 echo [4/5] Checking dependencies...
-python -c "import fastapi" >nul 2>&1
+call venv\Scripts\python.exe -c "import fastapi" >nul 2>&1
 if %errorlevel% neq 0 (
     echo [WARNING] Dependencies not installed
+    echo Upgrading pip...
+    call venv\Scripts\python.exe -m pip install --upgrade pip --quiet
     echo Installing dependencies...
-    pip install -r requirements.txt
+    call venv\Scripts\pip.exe install -r requirements.txt --quiet
     if %errorlevel% neq 0 (
-        echo [ERROR] Failed to install dependencies
+        echo [ERROR] Failed to install dependencies. See logs for details:
+        call venv\Scripts\pip.exe install -r requirements.txt
         pause
         exit /b 1
     )
@@ -108,7 +111,7 @@ echo.
 echo ========================================
 echo Checking 1C 7.7 COM server
 echo ========================================
-python -c "import win32com.client; win32com.client.Dispatch('V77.Application')" >nul 2>&1
+call venv\Scripts\python.exe -c "import win32com.client; win32com.client.Dispatch('V77.Application')" >nul 2>&1
 if %errorlevel% neq 0 (
     echo [WARNING] 1C 7.7 COM server not registered!
     echo.
@@ -141,7 +144,7 @@ echo.
 echo ========================================
 echo.
 
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 8100 --reload
+call venv\Scripts\python.exe -m uvicorn backend.main:app --host 0.0.0.0 --port 8100 --reload
 
 REM If server stopped
 echo.
