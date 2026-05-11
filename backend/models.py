@@ -8,6 +8,7 @@ class DocumentFilter(BaseModel):
 
     start_date: str = Field(..., description="Дата начала периода (дд.мм.гггг)")
     end_date: str = Field(..., description="Дата конца периода (дд.мм.гггг)")
+    firm_prefix: str | None = Field(default=None, description="Префикс фирмы (опционально)")
 
 
 class RealizationDocument(BaseModel):

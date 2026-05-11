@@ -9,6 +9,7 @@ function app() {
         endDate: '',
         docType: 'realizations',
         firmPrefix: '',
+        actionType: 'compare', // compare, load_77, load_8
         documents: [],
         comparisonResult: null,
         loading: false,
@@ -67,11 +68,24 @@ function app() {
             this.comparisonResult = null;
 
             try {
-                const endpoint = `/api/v1/compare/${this.docType}`;
+                let endpoint = `/api/v1/compare/${this.docType}`;
+                
+                // Определяем тип действия
+                if (this.actionType === 'load_77') {
+                    endpoint = `/api/v1/documents/77/${this.docType}`;
+                } else if (this.actionType === 'load_8') {
+                    endpoint = `/api/v1/documents/1c8/${this.docType}`;
+                }
+                
                 const body = {
                     start_date: this.convertDateToRu(this.startDate),
                     end_date: this.convertDateToRu(this.endDate)
                 };
+                
+                // Добавляем префикс фирмы если указан
+                if (this.firmPrefix && this.firmPrefix.trim()) {
+                    body.firm_prefix = this.firmPrefix.trim();
+                }
                 
                 const response = await fetch(endpoint, {
                     method: 'POST',
@@ -83,17 +97,35 @@ function app() {
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Ошибка при сравнении документов');
+                    throw new Error(errorData.detail || 'Ошибка при выполнении операции');
                 }
 
-                this.comparisonResult = await response.json();
+                const result = await response.json();
+                
+                // Для загрузки из одной системы форматируем результат как сравнение
+                if (this.actionType === 'load_77' || this.actionType === 'load_8') {
+                    this.comparisonResult = {
+                        matched: this.actionType === 'load_77' ? result.length : 0,
+                        mismatched: 0,
+                        only_in_77: this.actionType === 'load_77' ? result.length : 0,
+                        only_in_8: this.actionType === 'load_8' ? result.length : 0,
+                        documents: result.map(doc => ({
+                            ...doc,
+                            source: this.actionType === 'load_77' ? '77' : '8',
+                            has_mismatch: false
+                        })),
+                        sequence_errors: []
+                    };
+                } else {
+                    this.comparisonResult = result;
+                }
 
                 if (this.comparisonResult.documents.length === 0) {
                     this.error = 'Документы за указанный период не найдены';
                 }
             } catch (err) {
-                console.error('Ошибка сравнения документов:', err);
-                this.error = err.message || 'Не удалось сравнить документы';
+                console.error('Ошибка:', err);
+                this.error = err.message || 'Не удалось выполнить операцию';
             } finally {
                 this.loading = false;
             }
