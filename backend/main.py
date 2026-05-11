@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api.v1 import documents_77_router, health_router
+from backend.api.v1 import documents_77_router, documents_1c8_router, comparison_router, health_router
 from backend.config import settings
 
 # Настройка логирования
@@ -47,6 +47,8 @@ app.add_middleware(
 # Подключение роутеров
 app.include_router(health_router)
 app.include_router(documents_77_router)
+app.include_router(documents_1c8_router)
+app.include_router(comparison_router)
 
 # Статические файлы и шаблоны
 static_path = Path(__file__).parent.parent / "frontend" / "static"
