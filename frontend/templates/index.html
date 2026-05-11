@@ -11,9 +11,6 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
-
-    <!-- Alpine.js -->
-    <script defer src="/static/js/alpine.min.js"></script>
     
     <style>
         .mismatch-row { background-color: #ffcccc !important; }
@@ -348,10 +345,13 @@
         </div>
     </div>
 
+    <!-- Alpine.js (должен загрузиться перед app.js) -->
+    <script src="/static/js/alpine.min.js"></script>
+    
     <!-- Bootstrap JS -->
     <script src="/static/js/bootstrap.bundle.min.js"></script>
-
-    <!-- App JS -->
+    
+    <!-- App JS (использует Alpine.js, поэтому после него) -->
     <script src="/static/js/app.js"></script>
 </body>
 </html>
