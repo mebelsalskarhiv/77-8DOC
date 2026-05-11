@@ -46,7 +46,7 @@ def _fetch_invoices_sync(start_date: str, end_date: str) -> list[dict]:
         return fetch_invoices(v7, start_date, end_date)
 
 
-@router.post("/realizations", response_model=list[RealizationDocument])
+@router.post("/documents/77/realizations", response_model=list[RealizationDocument])
 async def get_realizations(filter: DocumentFilter):
     """
     Получить документы Реализация за период.
@@ -83,7 +83,7 @@ async def get_realizations(filter: DocumentFilter):
         )
 
 
-@router.post("/invoices", response_model=list[InvoiceDocument])
+@router.post("/documents/77/invoices", response_model=list[InvoiceDocument])
 async def get_invoices(filter: DocumentFilter):
     """
     Получить документы Счет-фактура выданный за период.
