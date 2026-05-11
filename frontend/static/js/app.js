@@ -1,5 +1,5 @@
 /**
- * Alpine.js приложение для работы с документами 1С
+ * Alpine.js приложение для сравнения документов 1С 7.7 и 1С 8
  */
 
 function app() {
@@ -8,10 +8,21 @@ function app() {
         startDate: '',
         endDate: '',
         docType: 'realizations',
+        firmPrefix: '',
         documents: [],
+        comparisonResult: null,
         loading: false,
         error: null,
         selectedDoc: null,
+        showSettings: false,
+        settings: {
+            dbPath77: '',
+            dbUser77: '',
+            dbPassword77: '',
+            odataUrl: '',
+            odataUser: '',
+            odataPassword: ''
+        },
 
         // Инициализация
         init() {
@@ -21,6 +32,9 @@ function app() {
 
             this.startDate = this.formatDateForInput(firstDay);
             this.endDate = this.formatDateForInput(today);
+            
+            // Загружаем настройки из localStorage
+            this.loadSettings();
         },
 
         // Форматирование даты для input[type="date"]
@@ -37,11 +51,6 @@ function app() {
             return `${day}.${month}.${year}`;
         },
 
-        // Вычисление общей суммы
-        get totalSum() {
-            return this.documents.reduce((sum, doc) => sum + (doc.sum || 0), 0);
-        },
-
         // Форматирование числа с разделителями
         formatNumber(num) {
             if (num === null || num === undefined) return '0.00';
@@ -51,38 +60,40 @@ function app() {
             }).format(num);
         },
 
-        // Загрузка документов
-        async loadDocuments() {
+        // Сравнение документов
+        async compareDocuments() {
             this.loading = true;
             this.error = null;
-            this.documents = [];
+            this.comparisonResult = null;
 
             try {
-                const endpoint = `/api/v1/${this.docType}`;
+                const endpoint = `/api/v1/compare/${this.docType}`;
+                const body = {
+                    start_date: this.convertDateToRu(this.startDate),
+                    end_date: this.convertDateToRu(this.endDate)
+                };
+                
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        start_date: this.convertDateToRu(this.startDate),
-                        end_date: this.convertDateToRu(this.endDate)
-                    })
+                    body: JSON.stringify(body)
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Ошибка при загрузке документов');
+                    throw new Error(errorData.detail || 'Ошибка при сравнении документов');
                 }
 
-                this.documents = await response.json();
+                this.comparisonResult = await response.json();
 
-                if (this.documents.length === 0) {
+                if (this.comparisonResult.documents.length === 0) {
                     this.error = 'Документы за указанный период не найдены';
                 }
             } catch (err) {
-                console.error('Ошибка загрузки документов:', err);
-                this.error = err.message || 'Не удалось загрузить документы';
+                console.error('Ошибка сравнения документов:', err);
+                this.error = err.message || 'Не удалось сравнить документы';
             } finally {
                 this.loading = false;
             }
@@ -93,6 +104,34 @@ function app() {
             this.selectedDoc = doc;
             const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
             modal.show();
+        },
+
+        // Сохранение настроек
+        saveSettings() {
+            localStorage.setItem('settings_77_8doc', JSON.stringify(this.settings));
+            alert('Настройки сохранены в браузере');
+        },
+
+        // Загрузка настроек
+        loadSettings() {
+            const saved = localStorage.getItem('settings_77_8doc');
+            if (saved) {
+                try {
+                    this.settings = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Ошибка загрузки настроек:', e);
+                }
+            }
+        },
+
+        // Загрузка настроек с сервера (заглушка)
+        async loadSettingsFromServer() {
+            try {
+                // В будущем можно добавить endpoint для получения текущих настроек
+                alert('Настройки загружаются из .env файла на сервере');
+            } catch (err) {
+                console.error('Ошибка загрузки настроек:', err);
+            }
         }
     };
 }
