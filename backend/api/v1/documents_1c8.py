@@ -201,13 +201,17 @@ async def fetch_invoices_1c8(
 @router.post("/1c8/realizations", response_model=list[RealizationDocument])
 async def get_realizations_1c8(filter: DocumentFilter, firm_prefix: Optional[str] = None):
     """Получить документы Реализация из 1С 8 за период."""
-    documents = await fetch_realizations_1c8(filter.start_date, filter.end_date, firm_prefix)
+    # Используем firm_prefix из filter если не передан явно
+    prefix = firm_prefix or (filter.firm_prefix if hasattr(filter, 'firm_prefix') else None)
+    documents = await fetch_realizations_1c8(filter.start_date, filter.end_date, prefix)
     return documents
 
 
 @router.post("/1c8/invoices", response_model=list[InvoiceDocument])
 async def get_invoices_1c8(filter: DocumentFilter, firm_prefix: Optional[str] = None):
     """Получить документы Счет-фактура выданный из 1С 8 за период."""
-    documents = await fetch_invoices_1c8(filter.start_date, filter.end_date, firm_prefix)
+    # Используем firm_prefix из filter если не передан явно
+    prefix = firm_prefix or (filter.firm_prefix if hasattr(filter, 'firm_prefix') else None)
+    documents = await fetch_invoices_1c8(filter.start_date, filter.end_date, prefix)
     return documents
 

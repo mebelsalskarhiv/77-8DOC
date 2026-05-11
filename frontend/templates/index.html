@@ -22,6 +22,7 @@
         .sequence-error { background-color: #fff3cd !important; }
         .settings-panel { display: none; }
         .settings-panel.show { display: block; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body>
@@ -39,7 +40,7 @@
         </div>
     </nav>
 
-    <div class="container mt-4" x-data="app()">
+    <div class="container mt-4" x-data="app()" x-init="init()">
         <!-- Панель настроек -->
         <div class="card mb-4" :class="{'show': showSettings}" x-show="showSettings" x-cloak>
             <div class="card-header bg-light">
@@ -108,6 +109,14 @@
                             <input type="date" class="form-control" id="endDate" x-model="endDate" required>
                         </div>
                         <div class="col-md-3">
+                            <label for="actionType" class="form-label">Действие</label>
+                            <select class="form-select" id="actionType" x-model="actionType">
+                                <option value="compare">Сравнить 1С 7.7 и 1С 8</option>
+                                <option value="load_77">Загрузить только из 1С 7.7</option>
+                                <option value="load_8">Загрузить только из 1С 8</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
                             <label for="docType" class="form-label">Тип документа</label>
                             <select class="form-select" id="docType" x-model="docType">
                                 <option value="realizations">Реализация товаров и услуг</option>
@@ -121,7 +130,11 @@
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100" :disabled="loading">
                                 <span x-show="!loading">
-                                    <i class="bi bi-search"></i> Сравнить
+                                    <i class="bi" :class="{
+                                        'bi-search': actionType === 'compare',
+                                        'bi-download': actionType === 'load_77' || actionType === 'load_8'
+                                    }"></i>
+                                    <span x-text="actionType === 'compare' ? 'Сравнить' : (actionType === 'load_77' ? 'Загрузить 1С 7.7' : 'Загрузить 1С 8')"></span>
                                 </span>
                                 <span x-show="loading">
                                     <span class="spinner-border spinner-border-sm" role="status"></span>

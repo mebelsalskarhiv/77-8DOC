@@ -68,6 +68,12 @@ async def get_realizations(filter: DocumentFilter):
             filter.start_date,
             filter.end_date
         )
+        
+        # Фильтрация по префиксу фирмы если указан
+        if hasattr(filter, 'firm_prefix') and filter.firm_prefix:
+            prefix = filter.firm_prefix.upper().strip()
+            documents = [d for d in documents if d.get('number', '').upper().startswith(prefix)]
+        
         return documents
     except Exception as e:
         logger.exception("Ошибка при получении документов Реализация")
@@ -99,6 +105,12 @@ async def get_invoices(filter: DocumentFilter):
             filter.start_date,
             filter.end_date
         )
+        
+        # Фильтрация по префиксу фирмы если указан
+        if hasattr(filter, 'firm_prefix') and filter.firm_prefix:
+            prefix = filter.firm_prefix.upper().strip()
+            documents = [d for d in documents if d.get('number', '').upper().startswith(prefix)]
+        
         return documents
     except Exception as e:
         logger.exception("Ошибка при получении документов СчетФактураВыданный")
